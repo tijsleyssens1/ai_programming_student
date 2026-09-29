@@ -31,7 +31,7 @@ class FloorCleaningAgent:
         self.col = 0  # startkolom (links)
 
         # Voorbeeld: grid aanmaken (alle tegels beginnen vuil)
-        # self.grid = [[False for _ in range(cols)] for _ in range(rows)]
+        self.grid = [[False for _ in range(cols)] for _ in range(rows)]
 
     # ---------- Basisbewegingen ----------
 
@@ -45,26 +45,34 @@ class FloorCleaningAgent:
 
     def move_down(self):
         """Verplaats de robot één tegel omlaag (rij +1)."""
-        # TODO: implementeer
-        pass
-
+        if self.row < 4:
+            self.row += 1
+            print(f"Verplaats naar ({self.row}, {self.col})")
+        else:
+            print("Kan niet omlaag: rand bereikt")
     def move_left(self):
         """Verplaats de robot één tegel naar links (kolom -1)."""
-        # TODO: implementeer
-        pass
+        if self.col > 0:
+            self.col -= 1
+            print(f"Verplaats naar ({self.row}, {self.col})")
+        else:
+            print("kan niet naar links: rand bereikt")
 
     def move_right(self):
         """Verplaats de robot één tegel naar rechts (kolom +1)."""
-        # TODO: implementeer
-        pass
+        if self.col < 9:
+            self.col += 1
+            print(f"Verplaats naar ({self.row}, {self.col})")
+        else: 
+            print("kan niet naar rechts: rand bereikt")
 
     # ---------- Stofzuigen ----------
 
     def clean_tile(self):
         """Stofzuig de huidige tegel (maak hem proper)."""
         # TODO: markeer huidige tegel als proper
-        # print(f"Tegel ({self.row}, {self.col}) is nu proper!")
-        pass
+        self.grid[self.row][self.col] = True
+        print(f"Tegel ({self.row}, {self.col}) is nu proper!")
 
     # ---------- Strategie ----------
 
@@ -75,7 +83,19 @@ class FloorCleaningAgent:
         """
         # TODO: implementeer een strategie
         # Tip: je kan een move_to(row, col) hulpmethode gebruiken
-        pass
+        move_direction = True
+        for i in range(self.cols):
+            for j in range(1, self.rows):
+                self.clean_tile()
+                if move_direction:
+                    self.move_down()
+                else: 
+                    self.move_up()
+            move_direction = not move_direction
+            self.clean_tile()
+            self.move_right()
+
+                
 
     # ---------- Helper om naar een specifieke tegel te gaan ----------
 
@@ -100,9 +120,15 @@ class FloorCleaningAgent:
                     rij_str += " R "
                 else:
                     # TODO: toon 'V' of 'P' op basis van interne grid
-                    rij_str += " ? "
+                    if self.grid[r][c]:
+                        rij_str += " P "
+
+                    else:
+                        rij_str += " V "
+                        
             print(rij_str)
         print()
+
 
 
 if __name__ == "__main__":
@@ -113,7 +139,7 @@ if __name__ == "__main__":
     robot.print_status()
 
     # TODO: roep clean_room() aan
-    # robot.clean_room()
+    robot.clean_room()
 
     print("Eindstatus:")
     robot.print_status()
