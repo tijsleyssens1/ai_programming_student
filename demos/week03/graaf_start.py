@@ -65,13 +65,23 @@ class Node:
 
 def bouw_nodes(graaf: dict[str, list[str]]) -> dict[str, Node]:
     """Vertaal de adjacency-dict naar Node-objecten met acties."""
-    pass
+    nodes = {stad: Node(State(stad)) for stad in graaf}
+    for stad, buurnodes in graaf.items():
+        for buur in buurnodes:
+            nodes[stad].add_action(nodes[buur])
+    return nodes
 
 
 def reconstruct_pad(node: Node) -> list[str]:
     """Bouw het gevonden pad op via de parent-verwijzingen."""
-    pass
-
+    reversed_pad = []
+    pad = []
+    while node is not None:
+        reversed_pad.append(node.state.name)
+        node = node.parent
+    while reversed_pad:
+        pad.append(reversed_pad.pop())
+    return pad
 
 def breadth_first_search(
     graaf: dict[str, list[str]], start: str, doel: str, verbose: bool = False
@@ -79,8 +89,28 @@ def breadth_first_search(
     """BFS volgens de cursustekst: openklappen niveau per niveau via een FIFO-queue.
     Vindt het pad met het minste aantal steden.
     """
-    pass
+    nodes = bouw_nodes(graaf)
+    initial_node = nodes[start]
+    goal_node = nodes[doel]
 
+    frontier = deque([initial_node])
+    visited = set()
+    while frontier:
+        node = frontier.popleft()
+
+        if node.state.name == goal_node.state.name:
+            return reconstruct_pad(node)
+
+        visited.add(node)
+        for neighbour in node.actions:
+            if (neighbour not in visited):
+                frontier.append(neighbour)
+                if neighbour.parent is None:
+                    neighbour.parent = node
+
+    return None
+
+    
 
 def depth_first_search(
     graaf: dict[str, list[str]], start: str, doel: str, verbose: bool = False
