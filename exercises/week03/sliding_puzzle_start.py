@@ -71,24 +71,42 @@ def solve_puzzle(start_puzzle):
     # TODO: los de puzzel op met BFS
     if start_puzzle.is_goal():
         return[start_puzzle]
-    new_config = start_puzzle.possible_new_configurations()
-    distance= []
-    for position in new_config:
-        position_distance = position.manhattan_distance()
-        distance.append(position_distance)
+
+    queu = deque([(start_puzzle, [start_puzzle])])
+    visited = {start_puzzle}
+
+    while queu:
+        current_puzzle, path = queu.popleft()
+
+        if current_puzzle.is_goal():
+            return path
+
+        for next_puzzle in current_puzzle.possible_new_configurations():
+            if next_puzzle not in visited:
+                visited.add(next_puzzle)
+                queu.append((next_puzzle, path + [next_puzzle]))
+
+    return None
     
     
 
 
 if __name__ == "__main__":
     game = [
-        [1, 2, 3],
-        [4, 5, 0],
-        [7, 8, 6]
+        [0, 6, 3],
+        [4, 5, 1],
+        [7, 8, 2]
     ]
     puzzle = SlidingPuzzle(game)
     print("Startconfiguratie:")
     puzzle.log()
 
     oplossing = solve_puzzle(puzzle)
-    # print("Oplossing:", oplossing)
+    # print("Oplossing:", oplossing)    
+    if oplossing:
+        print(f"Oplossing gevonden in {len(oplossing)} stappen!\n")
+        for i, stap in enumerate(oplossing):
+            print(f"Stap {i}:")
+            stap.log()
+    else:
+        print("Geen oplossing gevonden.")
