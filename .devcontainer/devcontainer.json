@@ -8,11 +8,11 @@
   },
   // mounts are needed to make ssh keys available with correct permissions
   "mounts": [
-    "source=${localEnv:USERPROFILE}/.ssh,target=/root/.ssh,type=bind,consistency=cached" 
+    "source=${localEnv:USERPROFILE}/.ssh,target=/root/.ssh_mount,type=bind,consistency=cached"
   ],
-  "updateContentCommand": "uv sync",
+  "updateContentCommand": "mkdir -p /root/.ssh && cp -R /root/.ssh_mount/* /root/.ssh/ && rm -f /root/.ssh/githubkey /root/.ssh/githubkey.pub && chown -R root:root /root/.ssh && chmod 700 /root/.ssh && chmod 600 /root/.ssh/config /root/.ssh/id_* && chmod 644 /root/.ssh/*.pub /root/.ssh/known_hosts*",
   // git is installed, the git config files reed the right permissions to work with ssh keys
-  "postCreateCommand": "apt-get update && apt-get install -y git && chmod 600 /root/.ssh/config /root/.ssh/id_* && chmod 644 /root/.ssh/*.pub /root/.ssh/known_hosts*",
+  "postCreateCommand": "apt-get update && apt-get install -y git && uv sync",
   "customizations": {
     "vscode": {
       "extensions": [
