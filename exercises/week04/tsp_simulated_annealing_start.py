@@ -177,10 +177,43 @@ if __name__ == "__main__":
     best_tour, best_distance = tsp_solver.simulated_annealing()
 
     best_tour_names = []
-    
+
     for element in best_tour:
         best_tour_names.append(european_cities[element])
 
     print("Best Tour:", best_tour)
     print("Best tour by names", best_tour_names)
     print("Best Distance:", best_distance)
+
+    # extra
+    num_runs = 10000  # Pas dit getantal aan naar hoeveel keer je de simulatie wilt draaien
+    overall_best_distance = float('inf')
+    overall_best_tour = None
+
+    print(f"Start simulatie: algoritme wordt {num_runs} keer uitgevoerd...")
+    a = 0
+    b = 1
+    for run in range(num_runs):
+        tsp_solver = TSPSolver(distance_matrix)
+        tour, distance = tsp_solver.simulated_annealing()
+
+        # Controleer of deze run beter is dan de algemene beste
+        if distance < overall_best_distance:
+            overall_best_distance = distance
+            overall_best_tour = tour
+        a += 1
+        if a == 100:
+            print(b * 100)
+            a = 0
+            b += 1
+
+    # Zet de tour in canonieke vorm (zodat hij netjes bij stad 0 start)
+    overall_best_tour = TSPSolver._canonical(overall_best_tour)
+
+    # Omzetten van indices naar stadsnamen
+    best_tour_names = [european_cities[element] for element in overall_best_tour]
+
+    print("\n--- RESULTAAT OVER ALLE RUNS ---")
+    print("Beste Tour (indices):", overall_best_tour)
+    print("Beste Tour (steden):", best_tour_names)
+    print("Beste Totale Afstand:", overall_best_distance)
