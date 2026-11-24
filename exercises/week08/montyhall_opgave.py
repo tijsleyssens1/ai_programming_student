@@ -9,19 +9,30 @@ class MontyHallGame:
 
     def choose_door(self, door_number):
         # Kies 0 1 of 2
-        pass
+        self.player_choice = door_number
 
     def host_reveal(self):
-        # De host geeft een deur met een geit vrij
-        pass
+        # Find all doors that are valid for the host to reveal:
+        # - Cannot be the player's choice
+        # - Cannot be the winning door (the car)
+        possible_doors = [
+            i for i in range(len(self.doors)) 
+            if i != self.player_choice and self.doors[i] != "auto"
+        ]
+
+        # The host randomly picks one of the valid goat doors
+        self.host_reveals = random.choice(possible_doors)
 
     def switch_choice(self):
         # Speler wisselt van keuze
-        pass
+        for i in range(len(self.doors)):
+            if i != self.player_choice and i != self.host_reveals:
+                self.player_choice = i
+                break
 
     def is_player_winner(self):
         # terminale check
-        pass
+        return self.doors[self.player_choice] == 'auto'
 
     def play_game(self, switch=False):
         # simulatie
@@ -49,7 +60,8 @@ def expectimax_simulation(switch):
     
 def compare():
     # Bereken percentage winst - print het resultaat
-    pass
+    test()
+
 
 if __name__ == "__main__":
     #test()

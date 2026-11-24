@@ -83,20 +83,65 @@ class Othello:
 
     def random_move(self):
         # TODO: kies een geldige zet
-        pass
+        moves = self.valid_moves(self.player)
+        if not moves:
+            return None
+        random.shuffle(moves)
+        return moves[0]
 
     def evaluate(self, player):
         # TODO: evaluatiefunctie (bijv. stukken + mobiliteit)
-        pass
+        x_count, o_count = self.count_pieces()
+        if player == 'X':
+            stone_diff = x_count - o_count
+        else:
+            stone_diff = o_count - x_count
+        return stone_diff
 
     def minimax(self, depth, is_maximizing, player):
         # TODO: implementeer minimax (simuleer zetten op een kopie)
-        pass
+        valid_moves = self.valid_moves(player)
+        if depth == 0 or not valid_moves:
+            return self.evaluate(player), None
+        if is_maximizing:
+            max_eval = float('-inf')
+            best_action = None
+            for move in valid_moves:
+                new_game = self.copy()
+                new_game.make_move(move[0], move[1], self.player)
+                new_game.change_player()
+                eval, _ = new_game.minimax(depth-1,False, player)
+                if eval > max_eval:
+                    max_eval = eval
+                    best_action = move
+            return max_eval, best_action
+        else:
+            min_eval = float('inf')
+            best_action = None
+            for move in valid_moves:
+                new_game = self.copy()
+                new_game.make_move(move[0], move[1], self.player)
+                new_game.change_player()
+
+                eval, _ = new_game.minimax(depth-1, True, player)
+                if eval < min_eval:
+                    min_eval = eval
+                    best_action = move
+            return min_eval, best_action
+            
+
 
     def best_move(self, depth=3):
         # TODO: kies de beste zet via minimax
-        pass
+        _, move = self.minimax(depth, True, self.player)
+        return move 
 
+    def copy(self):
+            """Maakt een diepe kopie van de huidige spelstaat."""
+            new_game = Othello()
+            new_game.board = [row[:] for row in self.board]  # Kopieer de 2D-lijst
+            new_game.player = self.player                    # Neem de huidige speler over
+            return new_game
 
 def play():
     game = Othello()
@@ -115,10 +160,27 @@ def play():
 
         if game.player == 'X':
             # TODO: laat de computer spelen met best_move()
-            pass
+            print("Computer ('X') denkt na...")
+            move = game.best_move(depth=3)
+            if move:
+                print(f"Computer kiest zet: {move}")
+                game.make_move(move[0], move[1], game.player)
         else:
             # TODO: menselijke input
-            pass
+            print("Jij bent aan de beurt ('O').")
+            valid = game.valid_moves(game.player)
+            print(f"Geldige zetten (rij, kolom): {valid}")
+            while True:
+                try:
+                    r = int(input("Geef rij (0-7): "))
+                    c = int(input("Geef kolom (0-7): "))
+                    if (r, c) in valid:
+                        game.make_move(r, c, game.player)
+                        break
+                    else:
+                        print("Ongeldige zet. Kies een geldige zet uit de lijst.")
+                except ValueError:
+                    print("Voer een geldig geheel getal in tussen 0 en 7.")
 
         game.change_player()
 
